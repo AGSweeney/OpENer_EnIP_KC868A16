@@ -531,6 +531,58 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
                 ,,,,
                 ,,,,
                 ;
+        Param40 =
+                0,
+                ,,
+                0x0000,
+                0xC7,
+                2,
+                "Analog INA1 Raw",
+                "counts",
+                "INA1 4-20 mA raw ADC count (little-endian)",
+                0,4095,0,
+                ,,,,
+                ,,,,
+                ;
+        Param41 =
+                0,
+                ,,
+                0x0000,
+                0xC7,
+                2,
+                "Analog INA4 Raw",
+                "counts",
+                "INA4 4-20 mA raw ADC count (little-endian)",
+                0,4095,0,
+                ,,,,
+                ,,,,
+                ;
+        Param42 =
+                0,
+                ,,
+                0x0000,
+                0xC7,
+                2,
+                "Analog INA2 Raw",
+                "counts",
+                "INA2 0-5 V raw ADC count (little-endian)",
+                0,4095,0,
+                ,,,,
+                ,,,,
+                ;
+        Param43 =
+                0,
+                ,,
+                0x0000,
+                0xC7,
+                2,
+                "Analog INA3 Raw",
+                "counts",
+                "INA3 0-5 V raw ADC count (little-endian)",
+                0,4095,0,
+                ,,,,
+                ,,,,
+                ;
 
 [Assembly]
         Object_Name = "Assembly Object";
@@ -539,11 +591,15 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
         Assem100 =
                 "Input Assembly",
                 "20 04 24 64",
-                2,
+                10,
                 0x0000,
                 ,,
                 1,Param6,
-                1,Param7;
+                1,Param7,
+                2,Param40,
+                2,Param41,
+                2,Param42,
+                2,Param43;
         Assem150 =
                 "Output Assembly",
                 "20 04 24 96",
@@ -607,7 +663,7 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
         MaxMsgConnections = 6;
         MaxConsumersPerMcast = 0;
         TSpec1 = Rx, 2, 1000;
-        TSpec2 = Tx, 2, 1000;
+        TSpec2 = Tx, 10, 1000;
 
 [TCP/IP Interface Class]
         Revision = 4;

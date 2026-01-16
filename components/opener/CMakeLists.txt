@@ -80,6 +80,7 @@ idf_component_register(
         freertos
         esp_eth
         esp_netif
+        esp_adc
         driver
         nvs_flash
     PRIV_REQUIRES

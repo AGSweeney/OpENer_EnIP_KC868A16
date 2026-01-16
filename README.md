@@ -56,14 +56,18 @@ The output assembly is used to send relay control data from the EtherNet/IP scan
 - Bit value 1 = relay on, 0 = relay off.
 - Outputs are active-low at the PCF8574, so the firmware inverts bits when writing to the expander.
 
-### Input Assembly (Instance 100) - 2 Bytes
+### Input Assembly (Instance 100) - 10 Bytes
 
-The input assembly is used to send digital input states from the device back to the EtherNet/IP scanner.
+The input assembly is used to send digital input states and analog readings from the device back to the EtherNet/IP scanner.
 
-| Byte | Bits | Inputs | Description |
+| Offset | Size | Inputs | Description |
 |------|------|--------|-------------|
-| 0 | 0-7 | X01-X08 | Opto inputs 1-8 |
-| 1 | 0-7 | X09-X16 | Opto inputs 9-16 |
+| 0 | 1 | X01-X08 | Opto inputs 1-8 |
+| 1 | 1 | X09-X16 | Opto inputs 9-16 |
+| 2 | 2 | INA1 | 4-20 mA raw ADC count (little-endian) |
+| 4 | 2 | INA4 | 4-20 mA raw ADC count (little-endian) |
+| 6 | 2 | INA2 | 0-5 V raw ADC count (little-endian) |
+| 8 | 2 | INA3 | 0-5 V raw ADC count (little-endian) |
 
 **Implementation Notes:**
 - All inputs are active-low; the firmware reports a bit as 1 when the physical signal is low.
@@ -109,19 +113,19 @@ Ethernet connectivity is provided via the LAN8720 PHY:
 The device supports three standard EtherNet/IP connection types, providing flexibility for different integration scenarios:
 
 1. **Exclusive Owner** (Connection 1)
-   - Bidirectional: Output 2 bytes, Input 2 bytes
+   - Bidirectional: Output 2 bytes, Input 10 bytes
    - Full control and status monitoring
    - Configurable RPI (Requested Packet Interval)
    - Recommended for primary control applications
 
 2. **Input Only** (Connection 2)
-   - Unidirectional: Input 2 bytes only
+   - Unidirectional: Input 10 bytes only
    - Status monitoring without control capability
    - Configurable RPI
    - Useful for monitoring-only applications
 
 3. **Listen Only** (Connection 3)
-   - Unidirectional: Input 2 bytes only
+   - Unidirectional: Input 10 bytes only
    - Read-only status monitoring
    - Configurable RPI
    - Suitable for passive monitoring and diagnostics

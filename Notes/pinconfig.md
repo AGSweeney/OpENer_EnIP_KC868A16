@@ -48,6 +48,15 @@ RST_NET is tied to 3V3 via RC (no ESP32 GPIO).
 | SDA | GPIO4 |
 | SCL | GPIO5 |
 
+## Analog Inputs
+
+| Name | Type | GPIO | ADC Channel |
+| --- | --- | --- | --- |
+| KC868-A16-INA1 | 4-20 mA | GPIO36 | ADC1_CH0 |
+| KC868-A16-INA4 | 4-20 mA | GPIO39 | ADC1_CH3 |
+| KC868-A16-INA2 | 0-5 V | GPIO34 | ADC1_CH6 |
+| KC868-A16-INA3 | 0-5 V | GPIO35 | ADC1_CH7 |
+
 ## PCF8574 I/O Expanders (I2C)
 
 | Role | I2C address | ID |

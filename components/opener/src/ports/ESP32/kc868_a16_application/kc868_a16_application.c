@@ -31,6 +31,7 @@
 #include "cipstring.h"
 #include "ciptypes.h"
 #include "typedefs.h"
+#include "esp_adc/adc_oneshot.h"
 #include "driver/gpio.h"
 #include "driver/i2c.h"
 #include "esp_err.h"
@@ -42,7 +43,13 @@ struct netif;
 #define DEMO_APP_OUTPUT_ASSEMBLY_NUM               150
 
 #define OUTPUT_ASSEMBLY_SIZE                      2
-#define INPUT_ASSEMBLY_SIZE                       2
+#define DIGITAL_INPUT_BYTES                       2
+#define ANALOG_INPUT_COUNT                        4
+#define ANALOG_INPUT_BYTES_PER_CHANNEL            2
+#define INPUT_ANALOG_START_OFFSET                 DIGITAL_INPUT_BYTES
+#define INPUT_ASSEMBLY_SIZE                       (DIGITAL_INPUT_BYTES + \
+                                                   (ANALOG_INPUT_COUNT * \
+                                                    ANALOG_INPUT_BYTES_PER_CHANNEL))
 
 #define I2C_PORT                I2C_NUM_0
 #define I2C_SDA_GPIO            4
@@ -55,9 +62,18 @@ struct netif;
 #define PCF8574_ADDR_OUTPUTS_1_8 0x24
 #define PCF8574_ADDR_OUTPUTS_9_16 0x25
 
+static const adc_channel_t kAnalogChannels[ANALOG_INPUT_COUNT] = {
+  ADC_CHANNEL_0,  /* GPIO36 - INA1 (4-20mA) */
+  ADC_CHANNEL_3,  /* GPIO39 - INA4 (4-20mA) */
+  ADC_CHANNEL_6,  /* GPIO34 - INA2 (0-5V) */
+  ADC_CHANNEL_7,  /* GPIO35 - INA3 (0-5V) */
+};
+
 static EipUint8 s_input_assembly_data[INPUT_ASSEMBLY_SIZE];
 static EipUint8 s_output_assembly_data[OUTPUT_ASSEMBLY_SIZE];
 static bool s_i2c_initialized = false;
+static bool s_adc_initialized = false;
+static adc_oneshot_unit_handle_t s_adc_handle = NULL;
 
 static esp_err_t Pcf8574Write(uint8_t addr, uint8_t value) {
   return i2c_master_write_to_device(I2C_PORT, addr, &value, 1,
@@ -97,25 +113,84 @@ static void InitializeI2C(void) {
   Pcf8574Write(PCF8574_ADDR_OUTPUTS_9_16, 0xFF);
 }
 
+static void InitializeAdc(void) {
+  if (s_adc_initialized) {
+    return;
+  }
+
+  adc_oneshot_unit_init_cfg_t unit_cfg = {
+    .unit_id = ADC_UNIT_1,
+    .ulp_mode = ADC_ULP_MODE_DISABLE,
+  };
+  if (adc_oneshot_new_unit(&unit_cfg, &s_adc_handle) != ESP_OK) {
+    s_adc_handle = NULL;
+    return;
+  }
+
+  adc_oneshot_chan_cfg_t chan_cfg = {
+    .atten = ADC_ATTEN_DB_12,
+    .bitwidth = ADC_BITWIDTH_12,
+  };
+  for (size_t channel_index = 0; channel_index < ANALOG_INPUT_COUNT;
+       ++channel_index) {
+    if (adc_oneshot_config_channel(s_adc_handle,
+                                   kAnalogChannels[channel_index],
+                                   &chan_cfg) != ESP_OK) {
+      adc_oneshot_del_unit(s_adc_handle);
+      s_adc_handle = NULL;
+      return;
+    }
+  }
+
+  s_adc_initialized = true;
+}
+
+static void StoreAnalogValue(size_t channel_index, uint16_t value) {
+  size_t offset = INPUT_ANALOG_START_OFFSET +
+                  (channel_index * ANALOG_INPUT_BYTES_PER_CHANNEL);
+  s_input_assembly_data[offset] = (uint8_t)(value & 0xFF);
+  s_input_assembly_data[offset + 1] = (uint8_t)(value >> 8);
+}
+
 static void UpdateInputs(void) {
   if (!s_i2c_initialized) {
     s_input_assembly_data[0] = 0;
     s_input_assembly_data[1] = 0;
+  } else {
+    uint8_t input_1_8 = 0xFF;
+    if (Pcf8574Read(PCF8574_ADDR_INPUTS_1_8, &input_1_8) == ESP_OK) {
+      s_input_assembly_data[0] = (uint8_t)~input_1_8;
+    } else {
+      s_input_assembly_data[0] = 0;
+    }
+
+    uint8_t input_9_16 = 0xFF;
+    if (Pcf8574Read(PCF8574_ADDR_INPUTS_9_16, &input_9_16) == ESP_OK) {
+      s_input_assembly_data[1] = (uint8_t)~input_9_16;
+    } else {
+      s_input_assembly_data[1] = 0;
+    }
+  }
+
+  if (!s_adc_initialized) {
+    for (size_t channel_index = 0; channel_index < ANALOG_INPUT_COUNT;
+         ++channel_index) {
+      StoreAnalogValue(channel_index, 0);
+    }
     return;
   }
 
-  uint8_t input_1_8 = 0xFF;
-  if (Pcf8574Read(PCF8574_ADDR_INPUTS_1_8, &input_1_8) == ESP_OK) {
-    s_input_assembly_data[0] = (uint8_t)~input_1_8;
-  } else {
-    s_input_assembly_data[0] = 0;
-  }
-
-  uint8_t input_9_16 = 0xFF;
-  if (Pcf8574Read(PCF8574_ADDR_INPUTS_9_16, &input_9_16) == ESP_OK) {
-    s_input_assembly_data[1] = (uint8_t)~input_9_16;
-  } else {
-    s_input_assembly_data[1] = 0;
+  for (size_t channel_index = 0; channel_index < ANALOG_INPUT_COUNT;
+       ++channel_index) {
+    int raw_value = 0;
+    if (adc_oneshot_read(s_adc_handle, kAnalogChannels[channel_index],
+                         &raw_value) != ESP_OK) {
+      raw_value = 0;
+    }
+    if (raw_value < 0) {
+      raw_value = 0;
+    }
+    StoreAnalogValue(channel_index, (uint16_t)raw_value);
   }
 }
 
@@ -133,6 +208,7 @@ static void UpdateOutputs(void) {
 
 EipStatus ApplicationInitialization(void) {
   InitializeI2C();
+  InitializeAdc();
 
   CreateAssemblyObject(DEMO_APP_OUTPUT_ASSEMBLY_NUM, s_output_assembly_data,
                        OUTPUT_ASSEMBLY_SIZE);
