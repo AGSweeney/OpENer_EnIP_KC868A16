@@ -1,4 +1,4 @@
-# KC868-A16 EnIP
+# KC868-A16 EnIP (Initial Upload, Untested 01162026 @ 12:37PM CST)
 
 <h2 align="center">EtherNet/IP Controller for Kincony KC868-A16</h2>
 
