@@ -23,7 +23,7 @@ Source: `pinconfig.txt`
 | RXD1 | GPIO26 |
 | RX_DV | GPIO27 |
 | REF CLK | GPIO17 |
-| PHY addr | 1 |
+| PHY addr | 0 |
 
 RST_NET is tied to 3V3 via RC (no ESP32 GPIO).
 
@@ -43,19 +43,21 @@ RST_NET is tied to 3V3 via RC (no ESP32 GPIO).
 
 ## I2C
 
-| Signal | GPIO |
-| --- | --- |
-| SDA | GPIO4 |
-| SCL | GPIO5 |
+| Signal | GPIO | Notes |
+| --- | --- | --- |
+| SDA | GPIO4 | PCF8574 I/O expanders |
+| SCL | GPIO5 | Frequency: 400 kHz |
 
 ## Analog Inputs
 
-| Name | Type | GPIO | ADC Channel |
-| --- | --- | --- | --- |
-| KC868-A16-INA1 | 4-20 mA | GPIO36 | ADC1_CH0 |
-| KC868-A16-INA4 | 4-20 mA | GPIO39 | ADC1_CH3 |
-| KC868-A16-INA2 | 0-5 V | GPIO34 | ADC1_CH6 |
-| KC868-A16-INA3 | 0-5 V | GPIO35 | ADC1_CH7 |
+The analog inputs are mapped to physical terminals A1-A4. Physical terminals A1 and A4 are 4-20mA inputs; A2 and A3 are 0-5V inputs.
+
+| Physical Terminal | Internal Channel | Type | GPIO | ADC Channel |
+| --- | --- | --- | --- | --- |
+| A1 | INA1 | 4-20 mA | GPIO36 | ADC1_CH0 |
+| A2 | INA2 | 0-5 V | GPIO34 | ADC1_CH6 |
+| A3 | INA3 | 0-5 V | GPIO35 | ADC1_CH7 |
+| A4 | INA4 | 4-20 mA | GPIO39 | ADC1_CH3 |
 
 ## PCF8574 I/O Expanders (I2C)
 

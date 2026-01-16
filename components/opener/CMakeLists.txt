@@ -83,6 +83,8 @@ idf_component_register(
         esp_adc
         driver
         nvs_flash
+        i2c_manager
+        pcf8574
     PRIV_REQUIRES
         lwip
         freertos

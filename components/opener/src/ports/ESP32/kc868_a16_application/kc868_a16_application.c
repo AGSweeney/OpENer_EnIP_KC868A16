@@ -33,9 +33,11 @@
 #include "typedefs.h"
 #include "esp_adc/adc_oneshot.h"
 #include "driver/gpio.h"
-#include "driver/i2c.h"
+#include "esp_log.h"
 #include "esp_err.h"
 #include "freertos/FreeRTOS.h"
+#include "i2c_manager.h"
+#include "pcf8574.h"
 
 struct netif;
 
@@ -51,66 +53,138 @@ struct netif;
                                                    (ANALOG_INPUT_COUNT * \
                                                     ANALOG_INPUT_BYTES_PER_CHANNEL))
 
-#define I2C_PORT                I2C_NUM_0
 #define I2C_SDA_GPIO            4
 #define I2C_SCL_GPIO            5
 #define I2C_FREQ_HZ             400000
-#define I2C_TIMEOUT_MS          100
 
 #define PCF8574_ADDR_INPUTS_1_8  0x22
 #define PCF8574_ADDR_INPUTS_9_16 0x21
 #define PCF8574_ADDR_OUTPUTS_1_8 0x24
 #define PCF8574_ADDR_OUTPUTS_9_16 0x25
 
+#define ANALOG_A1  36  /* Physical terminal A1 - INA1 (4-20mA) */
+#define ANALOG_A2  34  /* Physical terminal A2 - INA2 (0-5V) */
+#define ANALOG_A3  35  /* Physical terminal A3 - INA3 (0-5V) */
+#define ANALOG_A4  39  /* Physical terminal A4 - INA4 (4-20mA) */
+
 static const adc_channel_t kAnalogChannels[ANALOG_INPUT_COUNT] = {
-  ADC_CHANNEL_0,  /* GPIO36 - INA1 (4-20mA) */
-  ADC_CHANNEL_3,  /* GPIO39 - INA4 (4-20mA) */
-  ADC_CHANNEL_6,  /* GPIO34 - INA2 (0-5V) */
-  ADC_CHANNEL_7,  /* GPIO35 - INA3 (0-5V) */
+  ADC_CHANNEL_0,  /* GPIO36 - A1/INA1 (4-20mA) */
+  ADC_CHANNEL_6,  /* GPIO34 - A2/INA2 (0-5V) */
+  ADC_CHANNEL_7,  /* GPIO35 - A3/INA3 (0-5V) */
+  ADC_CHANNEL_3,  /* GPIO39 - A4/INA4 (4-20mA) */
 };
+
+static const char *TAG_IO = "kc868_io";
 
 static EipUint8 s_input_assembly_data[INPUT_ASSEMBLY_SIZE];
 static EipUint8 s_output_assembly_data[OUTPUT_ASSEMBLY_SIZE];
-static bool s_i2c_initialized = false;
+static bool s_pcf8574_initialized = false;
 static bool s_adc_initialized = false;
 static adc_oneshot_unit_handle_t s_adc_handle = NULL;
-
-static esp_err_t Pcf8574Write(uint8_t addr, uint8_t value) {
-  return i2c_master_write_to_device(I2C_PORT, addr, &value, 1,
-                                    pdMS_TO_TICKS(I2C_TIMEOUT_MS));
-}
-
-static esp_err_t Pcf8574Read(uint8_t addr, uint8_t *value) {
-  return i2c_master_read_from_device(I2C_PORT, addr, value, 1,
-                                     pdMS_TO_TICKS(I2C_TIMEOUT_MS));
-}
+static pcf8574_handle_t s_pcf8574_inputs_1_8 = NULL;
+static pcf8574_handle_t s_pcf8574_inputs_9_16 = NULL;
+static pcf8574_handle_t s_pcf8574_outputs_1_8 = NULL;
+static pcf8574_handle_t s_pcf8574_outputs_9_16 = NULL;
 
 static void InitializeI2C(void) {
-  if (s_i2c_initialized) {
+  if (s_pcf8574_initialized) {
     return;
   }
 
-  i2c_config_t conf = {
-    .mode = I2C_MODE_MASTER,
-    .sda_io_num = I2C_SDA_GPIO,
-    .scl_io_num = I2C_SCL_GPIO,
-    .sda_pullup_en = GPIO_PULLUP_ENABLE,
-    .scl_pullup_en = GPIO_PULLUP_ENABLE,
-    .master.clk_speed = I2C_FREQ_HZ,
+  // Initialize I2C manager
+  esp_err_t ret = i2c_manager_init(I2C_SDA_GPIO, I2C_SCL_GPIO, I2C_FREQ_HZ);
+  if (ret != ESP_OK) {
+    ESP_LOGE(TAG_IO, "Failed to initialize I2C manager: %s", esp_err_to_name(ret));
+    return;
+  }
+
+  // Scan for PCF8574 devices
+  const uint8_t expected_addresses[] = {
+    PCF8574_ADDR_INPUTS_1_8,
+    PCF8574_ADDR_INPUTS_9_16,
+    PCF8574_ADDR_OUTPUTS_1_8,
+    PCF8574_ADDR_OUTPUTS_9_16,
   };
-  if (i2c_param_config(I2C_PORT, &conf) != ESP_OK) {
-    return;
+  const char *device_names[] = {
+    "Inputs X01-X08",
+    "Inputs X09-X16",
+    "Outputs Y01-Y08",
+    "Outputs Y09-Y16",
+  };
+
+  ESP_LOGI(TAG_IO, "Checking PCF8574 device presence...");
+  size_t num_found = 0;
+  uint8_t found_addresses[4] = {0};
+  ret = pcf8574_scan(expected_addresses, sizeof(expected_addresses), found_addresses, &num_found);
+  if (ret == ESP_OK) {
+    for (size_t i = 0; i < sizeof(expected_addresses); i++) {
+      bool found = false;
+      for (size_t j = 0; j < num_found; j++) {
+        if (found_addresses[j] == expected_addresses[i]) {
+          ESP_LOGI(TAG_IO, "  [OK] PCF8574 at 0x%02X - %s", expected_addresses[i], device_names[i]);
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        ESP_LOGW(TAG_IO, "  [FAIL] PCF8574 at 0x%02X - %s not found", expected_addresses[i], device_names[i]);
+      }
+    }
+    ESP_LOGI(TAG_IO, "PCF8574 scan complete: %zu/%zu devices found", num_found, sizeof(expected_addresses));
   }
-  if (i2c_driver_install(I2C_PORT, conf.mode, 0, 0, 0) != ESP_OK) {
+
+  // Initialize PCF8574 devices
+  pcf8574_config_t config = {
+    .freq_hz = I2C_FREQ_HZ,
+  };
+
+  config.address = PCF8574_ADDR_INPUTS_1_8;
+  ret = pcf8574_init(&config, &s_pcf8574_inputs_1_8);
+  if (ret != ESP_OK) {
+    ESP_LOGE(TAG_IO, "Failed to initialize PCF8574 inputs_1_8 (0x%02X): %s", 
+             PCF8574_ADDR_INPUTS_1_8, esp_err_to_name(ret));
     return;
   }
 
-  s_i2c_initialized = true;
+  config.address = PCF8574_ADDR_INPUTS_9_16;
+  ret = pcf8574_init(&config, &s_pcf8574_inputs_9_16);
+  if (ret != ESP_OK) {
+    ESP_LOGE(TAG_IO, "Failed to initialize PCF8574 inputs_9_16 (0x%02X): %s", 
+             PCF8574_ADDR_INPUTS_9_16, esp_err_to_name(ret));
+    return;
+  }
 
-  Pcf8574Write(PCF8574_ADDR_INPUTS_1_8, 0xFF);
-  Pcf8574Write(PCF8574_ADDR_INPUTS_9_16, 0xFF);
-  Pcf8574Write(PCF8574_ADDR_OUTPUTS_1_8, 0xFF);
-  Pcf8574Write(PCF8574_ADDR_OUTPUTS_9_16, 0xFF);
+  config.address = PCF8574_ADDR_OUTPUTS_1_8;
+  ret = pcf8574_init(&config, &s_pcf8574_outputs_1_8);
+  if (ret != ESP_OK) {
+    ESP_LOGE(TAG_IO, "Failed to initialize PCF8574 outputs_1_8 (0x%02X): %s", 
+             PCF8574_ADDR_OUTPUTS_1_8, esp_err_to_name(ret));
+    return;
+  }
+
+  config.address = PCF8574_ADDR_OUTPUTS_9_16;
+  ret = pcf8574_init(&config, &s_pcf8574_outputs_9_16);
+  if (ret != ESP_OK) {
+    ESP_LOGE(TAG_IO, "Failed to initialize PCF8574 outputs_9_16 (0x%02X): %s", 
+             PCF8574_ADDR_OUTPUTS_9_16, esp_err_to_name(ret));
+    return;
+  }
+
+  s_pcf8574_initialized = true;
+  ESP_LOGI(TAG_IO, "PCF8574 devices initialized successfully");
+
+  // Initialize all PCF8574 outputs to 0xFF (all relays OFF - active low)
+  uint8_t init_value = 0xFF;
+  pcf8574_write(s_pcf8574_inputs_1_8, init_value);
+  pcf8574_write(s_pcf8574_inputs_9_16, init_value);
+  ret = pcf8574_write(s_pcf8574_outputs_1_8, init_value);
+  if (ret != ESP_OK) {
+    ESP_LOGE(TAG_IO, "Failed to initialize outputs_1_8: %s", esp_err_to_name(ret));
+  }
+  ret = pcf8574_write(s_pcf8574_outputs_9_16, init_value);
+  if (ret != ESP_OK) {
+    ESP_LOGE(TAG_IO, "Failed to initialize outputs_9_16: %s", esp_err_to_name(ret));
+  }
 }
 
 static void InitializeAdc(void) {
@@ -131,11 +205,13 @@ static void InitializeAdc(void) {
     .atten = ADC_ATTEN_DB_12,
     .bitwidth = ADC_BITWIDTH_12,
   };
+  
   for (size_t channel_index = 0; channel_index < ANALOG_INPUT_COUNT;
        ++channel_index) {
     if (adc_oneshot_config_channel(s_adc_handle,
                                    kAnalogChannels[channel_index],
                                    &chan_cfg) != ESP_OK) {
+      ESP_LOGE(TAG_IO, "Failed to configure ADC channel %zu", channel_index);
       adc_oneshot_del_unit(s_adc_handle);
       s_adc_handle = NULL;
       return;
@@ -153,19 +229,19 @@ static void StoreAnalogValue(size_t channel_index, uint16_t value) {
 }
 
 static void UpdateInputs(void) {
-  if (!s_i2c_initialized) {
+  if (!s_pcf8574_initialized) {
     s_input_assembly_data[0] = 0;
     s_input_assembly_data[1] = 0;
   } else {
     uint8_t input_1_8 = 0xFF;
-    if (Pcf8574Read(PCF8574_ADDR_INPUTS_1_8, &input_1_8) == ESP_OK) {
+    if (pcf8574_read(s_pcf8574_inputs_1_8, &input_1_8) == ESP_OK) {
       s_input_assembly_data[0] = (uint8_t)~input_1_8;
     } else {
       s_input_assembly_data[0] = 0;
     }
 
     uint8_t input_9_16 = 0xFF;
-    if (Pcf8574Read(PCF8574_ADDR_INPUTS_9_16, &input_9_16) == ESP_OK) {
+    if (pcf8574_read(s_pcf8574_inputs_9_16, &input_9_16) == ESP_OK) {
       s_input_assembly_data[1] = (uint8_t)~input_9_16;
     } else {
       s_input_assembly_data[1] = 0;
@@ -195,15 +271,22 @@ static void UpdateInputs(void) {
 }
 
 static void UpdateOutputs(void) {
-  if (!s_i2c_initialized) {
+  if (!s_pcf8574_initialized) {
+    ESP_LOGW(TAG_IO, "UpdateOutputs called but PCF8574 not initialized");
     return;
   }
 
   uint8_t outputs_1_8 = (uint8_t)~s_output_assembly_data[0];
-  Pcf8574Write(PCF8574_ADDR_OUTPUTS_1_8, outputs_1_8);
+  esp_err_t ret = pcf8574_write(s_pcf8574_outputs_1_8, outputs_1_8);
+  if (ret != ESP_OK) {
+    ESP_LOGE(TAG_IO, "Failed to write outputs_1_8 (0x%02X): %s", outputs_1_8, esp_err_to_name(ret));
+  }
 
   uint8_t outputs_9_16 = (uint8_t)~s_output_assembly_data[1];
-  Pcf8574Write(PCF8574_ADDR_OUTPUTS_9_16, outputs_9_16);
+  ret = pcf8574_write(s_pcf8574_outputs_9_16, outputs_9_16);
+  if (ret != ESP_OK) {
+    ESP_LOGE(TAG_IO, "Failed to write outputs_9_16 (0x%02X): %s", outputs_9_16, esp_err_to_name(ret));
+  }
 }
 
 EipStatus ApplicationInitialization(void) {

@@ -10,7 +10,5 @@ build/
 **/.cache/
 
 # Folders with "Private" in the name (case-insensitive)
-**/*[Pp]rivate*/
-**/*Private*/
-**/*private*/
+
 

@@ -45,7 +45,7 @@
 static const char *TAG = "main";
 static esp_netif_t *s_eth_netif = NULL;
 
-#define ETH_PHY_ADDR         1
+#define ETH_PHY_ADDR         0
 #define ETH_PHY_MDC_PIN       23
 #define ETH_PHY_MDIO_PIN      18
 
@@ -107,7 +107,7 @@ static void got_ip_event_handler(void *arg, esp_event_base_t event_base,
 
 void app_main(void)
 {
-    ESP_LOGI(TAG, "Hello World!");
+    ESP_LOGI(TAG, "TEST BUILD - NOT FOR PRODUCTION!");
     
     ESP_ERROR_CHECK(nvs_flash_init());
 
@@ -140,10 +140,15 @@ void app_main(void)
         ESP_LOGI(TAG, "No saved IP config in NVS, using DHCP by default");
     }
 
+    // Add delay to allow PHY power supply and clock to stabilize
+    ESP_LOGI(TAG, "Waiting for PHY power/clock stabilization...");
+    vTaskDelay(pdMS_TO_TICKS(200));
+
     eth_mac_config_t mac_config = ETH_MAC_DEFAULT_CONFIG();
     eth_phy_config_t phy_config = ETH_PHY_DEFAULT_CONFIG();
     phy_config.phy_addr = ETH_PHY_ADDR;
     phy_config.reset_gpio_num = -1;
+    phy_config.reset_timeout_ms = 500;  // Increase timeout for power-up detection
 
     eth_esp32_emac_config_t esp32_emac_config = ETH_ESP32_EMAC_DEFAULT_CONFIG();
     esp32_emac_config.smi_gpio.mdc_num = ETH_PHY_MDC_PIN;

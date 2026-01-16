@@ -1,12 +1,10 @@
-# KC868-A16 EnIP (Initial Upload, Untested 01162026 @ 12:37PM CST)
-
-<h2 align="center">EtherNet/IP Controller for Kincony KC868-A16</h2>
+# EtherNet/IP Controller for Kincony KC868-A16
 
 ## Overview
 
 This project represents a proof-of-concept implementation of the [OpENer EtherNet/IP Stack](https://github.com/EIPStackGroup/OpENer) ported to the ESP32 platform. The development of this port serves to demonstrate the feasibility of running industrial EtherNet/IP communication protocols on cost-effective, widely available microcontroller platforms.
 
-This implementation targets the **Kincony KC868-A16** Ethernet I/O controller, exposing its 16 relay outputs and 16 digital inputs (via PCF8574) over EtherNet/IP implicit messaging. The result is a compact, network-connected digital I/O device suitable for PLC integration and general industrial automation tasks.
+This implementation targets the **Kincony KC868-A16** Ethernet I/O controller, exposing its 16 relay outputs, 16 digital inputs (via PCF8574), and 4 analog inputs over EtherNet/IP implicit messaging. The result is a compact, network-connected I/O device suitable for PLC integration and general industrial automation tasks.
 
 ## Project Status
 
@@ -16,14 +14,15 @@ This implementation targets the **Kincony KC868-A16** Ethernet I/O controller, e
 
 ### Kincony KC868-A16
 
-The Kincony KC868-A16 is an ESP32-based Ethernet I/O controller with 16 relay outputs and 16 opto-isolated inputs provided by PCF8574 I/O expanders. This project uses the board's LAN8720 Ethernet PHY and PCF8574 expanders to expose I/O over EtherNet/IP.
+The Kincony KC868-A16 is an ESP32-based Ethernet I/O controller with 16 relay outputs, 16 opto-isolated inputs provided by PCF8574 I/O expanders, and 4 analog inputs. This project uses the board's LAN8720 Ethernet PHY, PCF8574 expanders, and built-in ADC to expose I/O over EtherNet/IP.
 
 **Key Features:**
 - **Microcontroller**: ESP32
 - **Ethernet**: LAN8720 PHY with RMII interface
-- **Outputs**: 16 relay outputs via PCF8574 (active-low)
-- **Inputs**: 16 opto-isolated inputs via PCF8574 (active-low)
-- **I2C**: SDA GPIO4, SCL GPIO5 for PCF8574 expanders
+- **Digital Outputs**: 16 relay outputs via PCF8574 (active-low)
+- **Digital Inputs**: 16 opto-isolated inputs via PCF8574 (active-low)
+- **Analog Inputs**: 4 channels (2x 4-20mA, 2x 0-5V) via ESP32 ADC
+- **I2C**: SDA GPIO4, SCL GPIO5 for PCF8574 expanders (400 kHz)
 
 **Reference Material:**
 - `Notes/pinconfig.md`
@@ -64,13 +63,15 @@ The input assembly is used to send digital input states and analog readings from
 |------|------|--------|-------------|
 | 0 | 1 | X01-X08 | Opto inputs 1-8 |
 | 1 | 1 | X09-X16 | Opto inputs 9-16 |
-| 2 | 2 | INA1 | 4-20 mA raw ADC count (little-endian) |
-| 4 | 2 | INA4 | 4-20 mA raw ADC count (little-endian) |
-| 6 | 2 | INA2 | 0-5 V raw ADC count (little-endian) |
-| 8 | 2 | INA3 | 0-5 V raw ADC count (little-endian) |
+| 2 | 2 | A1 (INA1) | 4-20 mA raw ADC count (little-endian) |
+| 4 | 2 | A2 (INA2) | 0-5 V raw ADC count (little-endian) |
+| 6 | 2 | A3 (INA3) | 0-5 V raw ADC count (little-endian) |
+| 8 | 2 | A4 (INA4) | 4-20 mA raw ADC count (little-endian) |
 
 **Implementation Notes:**
-- All inputs are active-low; the firmware reports a bit as 1 when the physical signal is low.
+- Digital inputs are active-low; the firmware reports a bit as 1 when the physical signal is low.
+- Analog inputs are sampled at 12-bit resolution (0-4095 counts) with 11 dB attenuation.
+- Analog input mapping: A1 (INA1) and A4 (INA4) are 4-20mA inputs; A2 (INA2) and A3 (INA3) are 0-5V inputs.
 
 ## GPIO Pin Assignments
 
@@ -106,7 +107,7 @@ Ethernet connectivity is provided via the LAN8720 PHY:
 | RX_DV | GPIO 27 | RMII CRS_DV |
 | REF CLK | GPIO 17 | RMII clock output |
 
-**Ethernet PHY**: LAN8720 (address 1)
+**Ethernet PHY**: LAN8720 (address 0)
 
 ## EtherNet/IP Connection Types
 
@@ -219,7 +220,9 @@ KC868_A16_EnIP/
 ├── components/
 │   ├── opener/            # OpENer EtherNet/IP stack
 │   │   └── src/ports/ESP32/
-│   │       └── kc868_a16_application/  # Application-specific code
+│   │       └── kc868_a16_application/  # Application-specific I/O code
+│   ├── i2c_manager/       # I2C bus management component
+│   ├── pcf8574/           # PCF8574 I/O expander driver component
 │   ├── webui/             # Web interface for network configuration
 │   ├── lwip/              # LWIP network stack
 │   └── esp_netif/         # ESP-IDF network interface

@@ -17,9 +17,14 @@ idf_component_register(
     REQUIRES 
         lwip
         freertos
+        i2c_manager
+        pcf8574
     PRIV_REQUIRES
         lwip
         freertos
+        i2c_manager
+        pcf8574
+        driver
 )
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE ESP32)
