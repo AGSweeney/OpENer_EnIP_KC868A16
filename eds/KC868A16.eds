@@ -1,0 +1,642 @@
+$ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
+
+[File]
+        DescText = "Kincony KC868-A16 EtherNet/IP Controller";
+        CreateDate = 01-16-2026;
+        CreateTime = 12:00:00;
+        ModDate = 01-16-2026;
+        ModTime = 12:00:00;
+        Revision = 1.2;
+        HomeURL = "http://www.AGSweeney.net";
+
+[Device]
+        VendCode = 55512;
+        VendName = "AGSweeney Automation";
+        ProdType = 7;
+        ProdTypeStr = "General Purpose Discrete I/O";
+        ProdCode = 1;
+        MajRev = 1;
+        MinRev = 1;
+        ProdName = "KC868-A16";
+        Icon = "favicon.ico";
+
+[Device Classification]
+        Class1 = EtherNetIP;
+
+[Params]
+        Param1 =
+                0,
+                ,,
+                0x0000,
+                0xC8,
+                4,
+                "Exclusive Owner RPI",
+                "us",
+                "Requested Packet Interval for the Exclusive Owner connection",
+                1000,,10000,
+                ,,,,
+                ,,,,
+                ;
+        Param2 =
+                0,
+                ,,
+                0x0000,
+                0xC8,
+                4,
+                "Input Only RPI",
+                "us",
+                "Requested Packet Interval for the Input Only connection",
+                1000,,10000,
+                ,,,,
+                ,,,,
+                ;
+        Param3 =
+                0,
+                ,,
+                0x0000,
+                0xC8,
+                4,
+                "Listen Only RPI",
+                "us",
+                "Requested Packet Interval for the Listen Only connection",
+                1000,,10000,
+                ,,,,
+                ,,,,
+                ;
+        Param4 =
+                0,
+                ,,
+                0x0000,
+                0xC6,
+                1,
+                "Output Byte 0",
+                "",
+                "Relay outputs Y01-Y08 (bit 0=Y01 .. bit 7=Y08)",
+                0,255,0,
+                ,,,,
+                ,,,,
+                ;
+        Param5 =
+                0,
+                ,,
+                0x0000,
+                0xC6,
+                1,
+                "Output Byte 1",
+                "",
+                "Relay outputs Y09-Y16 (bit 0=Y09 .. bit 7=Y16)",
+                0,255,0,
+                ,,,,
+                ,,,,
+                ;
+        Param6 =
+                0,
+                ,,
+                0x0000,
+                0xC6,
+                1,
+                "Input Byte 0",
+                "",
+                "Opto inputs X01-X08 (bit 0=X01 .. bit 7=X08)",
+                0,255,0,
+                ,,,,
+                ,,,,
+                ;
+        Param7 =
+                0,
+                ,,
+                0x0000,
+                0xC6,
+                1,
+                "Input Byte 1",
+                "",
+                "Opto inputs X09-X16 (bit 0=X09 .. bit 7=X16)",
+                0,255,0,
+                ,,,,
+                ,,,,
+                ;
+        Param8 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y01",
+                "",
+                "Output Byte 0 bit 0",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param9 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y02",
+                "",
+                "Output Byte 0 bit 1",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param10 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y03",
+                "",
+                "Output Byte 0 bit 2",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param11 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y04",
+                "",
+                "Output Byte 0 bit 3",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param12 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y05",
+                "",
+                "Output Byte 0 bit 4",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param13 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y06",
+                "",
+                "Output Byte 0 bit 5",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param14 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y07",
+                "",
+                "Output Byte 0 bit 6",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param15 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y08",
+                "",
+                "Output Byte 0 bit 7",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param16 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y09",
+                "",
+                "Output Byte 1 bit 0",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param17 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y10",
+                "",
+                "Output Byte 1 bit 1",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param18 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y11",
+                "",
+                "Output Byte 1 bit 2",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param19 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y12",
+                "",
+                "Output Byte 1 bit 3",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param20 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y13",
+                "",
+                "Output Byte 1 bit 4",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param21 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y14",
+                "",
+                "Output Byte 1 bit 5",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param22 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y15",
+                "",
+                "Output Byte 1 bit 6",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param23 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Output Y16",
+                "",
+                "Output Byte 1 bit 7",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param24 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X01",
+                "",
+                "Input Byte 0 bit 0",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param25 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X02",
+                "",
+                "Input Byte 0 bit 1",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param26 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X03",
+                "",
+                "Input Byte 0 bit 2",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param27 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X04",
+                "",
+                "Input Byte 0 bit 3",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param28 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X05",
+                "",
+                "Input Byte 0 bit 4",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param29 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X06",
+                "",
+                "Input Byte 0 bit 5",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param30 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X07",
+                "",
+                "Input Byte 0 bit 6",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param31 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X08",
+                "",
+                "Input Byte 0 bit 7",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param32 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X09",
+                "",
+                "Input Byte 1 bit 0",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param33 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X10",
+                "",
+                "Input Byte 1 bit 1",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param34 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X11",
+                "",
+                "Input Byte 1 bit 2",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param35 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X12",
+                "",
+                "Input Byte 1 bit 3",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param36 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X13",
+                "",
+                "Input Byte 1 bit 4",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param37 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X14",
+                "",
+                "Input Byte 1 bit 5",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param38 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X15",
+                "",
+                "Input Byte 1 bit 6",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+        Param39 =
+                0,
+                ,,
+                0x0000,
+                0xC1,
+                1,
+                "Input X16",
+                "",
+                "Input Byte 1 bit 7",
+                0,1,0,
+                ,,,,
+                ,,,,
+                ;
+
+[Assembly]
+        Object_Name = "Assembly Object";
+        Object_Class_Code = 0x04;
+        Number_Of_Static_Instances = 2;
+        Assem100 =
+                "Input Assembly",
+                "20 04 24 64",
+                2,
+                0x0000,
+                ,,
+                1,Param6,
+                1,Param7;
+        Assem150 =
+                "Output Assembly",
+                "20 04 24 96",
+                2,
+                0x0001,
+                ,,
+                1,Param4,
+                1,Param5;
+
+[Connection Manager]
+        Revision = 1;
+        Object_Name = "Connection Manager Object";
+        Object_Class_Code = 0x06;
+        MaxInst = 1;
+        Number_Of_Static_Instances = 1;
+        Max_Number_Of_Dynamic_Instances = 0;
+        Connection1 =
+                0x84010002,
+                0x44640405,
+                Param1,2,Assem150,
+                Param1,2,Assem100,
+                ,,
+                ,,
+                "Exclusive Owner",
+                "Exclusive Owner connection for relay control",
+                "20 04 24 96 2C 64";
+        Connection2 =
+                0x02010002,
+                0x44640305,
+                Param2,0,,
+                Param2,2,Assem100,
+                ,,
+                ,,
+                "Input Only",
+                "Input Only connection for input monitoring",
+                "20 04 24 64";
+        Connection3 =
+                0x01010002,
+                0x44240305,
+                Param3,0,,
+                Param3,2,Assem100,
+                ,,
+                ,,
+                "Listen Only",
+                "Listen Only connection for input monitoring",
+                "20 04 2C 64";
+
+[Port]
+        Object_Name = "Port Object";
+        Object_Class_Code = 0xF4;
+        Port1 =
+                TCP,
+                "EtherNet/IP Port",
+                "20 F5 24 01",
+                1,
+                0x00,
+                ;
+
+[Capacity]
+        MaxIOConnections = 3;
+        MaxMsgConnections = 6;
+        MaxConsumersPerMcast = 0;
+        TSpec1 = Rx, 2, 1000;
+        TSpec2 = Tx, 2, 1000;
+
+[TCP/IP Interface Class]
+        Revision = 4;
+        Object_Name = "TCP/IP Interface Object";
+        Object_Class_Code = 0xF5;
+        MaxInst = 1;
+        Number_Of_Static_Instances = 1;
+        Max_Number_Of_Dynamic_Instances = 0;
+
+[Ethernet Link Class]
+        Revision = 4;
+        Object_Name = "Ethernet Link Object";
+        Object_Class_Code = 0xF6;
+        MaxInst = 1;
+        Number_Of_Static_Instances = 1;
+        Max_Number_Of_Dynamic_Instances = 0;
+
+[Identity Class]
+        Revision = 1;
+        Object_Name = "Identity Object";
+        Object_Class_Code = 0x01;
+        MaxInst = 1;
+        Number_Of_Static_Instances = 1;
+        Max_Number_Of_Dynamic_Instances = 0;
+
+[QoS Class]
+        Revision = 1;
+        Object_Name = "QoS Object";
+        Object_Class_Code = 0x48;
+        MaxInst = 1;
+        Number_Of_Static_Instances = 1;
+        Max_Number_Of_Dynamic_Instances = 0;

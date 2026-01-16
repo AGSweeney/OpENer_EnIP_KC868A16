@@ -1,0 +1,16 @@
+# VSCode folders
+.vscode/
+
+# Build folders
+build/
+**/build/
+
+# Cache folders
+.cache/
+**/.cache/
+
+# Folders with "Private" in the name (case-insensitive)
+**/*[Pp]rivate*/
+**/*Private*/
+**/*private*/
+
