@@ -40,7 +40,11 @@ This project integrates the [OpENer EtherNet/IP Stack](https://github.com/EIPSta
 
 ## Assembly Data Structure
 
-The device implements two EtherNet/IP assemblies for I/O data exchange. These assemblies define the data structure used for communication between the EtherNet/IP scanner (typically a PLC) and the device.
+The device implements three EtherNet/IP assemblies for I/O data exchange. These assemblies define the data structure used for communication between the EtherNet/IP scanner (typically a PLC) and the device.
+
+### Configuration Assembly (Instance 151) - 0 Bytes
+
+The configuration assembly is required for establishing EtherNet/IP connections. It serves as the starting point for the connection path. This assembly contains no data but must be present for proper connection establishment.
 
 ### Output Assembly (Instance 150) - 2 Bytes
 
@@ -111,24 +115,27 @@ Ethernet connectivity is provided via the LAN8720 PHY:
 
 ## EtherNet/IP Connection Types
 
-The device supports three standard EtherNet/IP connection types, providing flexibility for different integration scenarios:
+The device supports three standard EtherNet/IP connection types, providing flexibility for different integration scenarios. All connections use Configuration Assembly 151 as the starting point in the connection path.
 
 1. **Exclusive Owner** (Connection 1)
    - Bidirectional: Output 2 bytes, Input 10 bytes
    - Full control and status monitoring
    - Configurable RPI (Requested Packet Interval)
+   - Connection Path: Config 151 → Output 150 → Input 100
    - Recommended for primary control applications
 
 2. **Input Only** (Connection 2)
    - Unidirectional: Input 10 bytes only
    - Status monitoring without control capability
    - Configurable RPI
+   - Connection Path: Config 151 → Input 100
    - Useful for monitoring-only applications
 
 3. **Listen Only** (Connection 3)
    - Unidirectional: Input 10 bytes only
    - Read-only status monitoring
    - Configurable RPI
+   - Connection Path: Config 151 → Input 100
    - Suitable for passive monitoring and diagnostics
 
 ## Device Identity
@@ -201,15 +208,30 @@ The device uses a 4MB flash with the following partition layout:
 
 ## EDS File
 
-**⚠️ WARNING: The EDS file is incomplete and should NOT be used for production or device configuration.**
-
-An Electronic Data Sheet (EDS) file is provided for reference only:
+An Electronic Data Sheet (EDS) file is provided for use with Studio 5000 and other EtherNet/IP configuration tools:
 
 - **Location**: `eds/KC868A16.eds`
 - **Format**: EZ-EDS v3.38
-- **Status**: Incomplete - Do not use
+- **Status**: Validated and functional
 
-The EDS file is a work in progress and may contain errors or missing information. It should not be used with EtherNet/IP configuration tools until it has been completed and validated.
+### Installing the EDS File
+
+1. Open Studio 5000 Logix Designer
+2. Go to **Tools > EDS Hardware Installation Tool**
+3. Select **Add** and browse to `eds/KC868A16.eds`
+4. Complete the installation wizard
+5. The device will appear as "KC868-A16" under "AGSweeney Automation"
+
+### Generic Ethernet Module Configuration
+
+If not using the EDS file, configure as a Generic Ethernet Module with:
+
+| Parameter | Value |
+|-----------|-------|
+| Comm Format | Data - SINT |
+| Input Assembly | Instance: 100, Size: 10 bytes |
+| Output Assembly | Instance: 150, Size: 2 bytes |
+| Configuration Assembly | Instance: 151, Size: 0 bytes |
 
 ## Project Structure
 
@@ -227,7 +249,7 @@ KC868_A16_EnIP/
 │   ├── lwip/              # LWIP network stack
 │   └── esp_netif/         # ESP-IDF network interface
 ├── docs/                   # Documentation and images
-├── eds/                    # Electronic Data Sheet (incomplete)
+├── eds/                    # Electronic Data Sheet for Studio 5000
 └── partitions.csv         # Flash partition table
 ```
 
@@ -238,7 +260,7 @@ KC868_A16_EnIP/
 All original code in this project is licensed under the MIT License:
 
 ```
-Copyright (c) 2025, Adam G. Sweeney <agsweeney@gmail.com>
+Copyright (c) 2025-2026, Adam G. Sweeney <agsweeney@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
