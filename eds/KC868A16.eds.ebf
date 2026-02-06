@@ -655,7 +655,7 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
                 ,,
                 "Input Only",
                 "Input Only connection for input monitoring",
-                "20 04 24 97 2C 64";
+                "20 04 24 97 24 64";
         Connection3 =
                 0x01010002,
                 0x44240305,
