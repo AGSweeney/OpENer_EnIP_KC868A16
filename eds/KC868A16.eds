@@ -6,7 +6,7 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
         CreateTime = 12:00:00;
         ModDate = 01-16-2026;
         ModTime = 12:00:00;
-        Revision = 1.2;
+        Revision = 1.3;
         HomeURL = "http://www.AGSweeney.net";
 
 [Device]
@@ -587,7 +587,7 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
 [Assembly]
         Object_Name = "Assembly Object";
         Object_Class_Code = 0x04;
-        Number_Of_Static_Instances = 2;
+        Number_Of_Static_Instances = 3;
         Assem100 =
                 "Input Assembly",
                 "20 04 24 64",
@@ -608,6 +608,12 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
                 ,,
                 1,Param4,
                 1,Param5;
+        Assem151 =
+                "Configuration Assembly",
+                "20 04 24 97",
+                0,
+                0x0000,
+                ,,;
 
 [Connection Manager]
         Revision = 1;
@@ -621,31 +627,31 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
                 0x44640405,
                 Param1,2,Assem150,
                 Param1,10,Assem100,
-                ,,
+                Assem151,,
                 ,,
                 "Exclusive Owner",
                 "Exclusive Owner connection for relay control",
-                "20 04 24 96 2C 64";
+                "20 04 24 97 2C 96 2C 64";
         Connection2 =
                 0x02010002,
                 0x44640305,
                 Param2,0,,
                 Param2,10,Assem100,
-                ,,
+                Assem151,,
                 ,,
                 "Input Only",
                 "Input Only connection for input monitoring",
-                "20 04 24 64";
+                "20 04 24 97 2C 64";
         Connection3 =
                 0x01010002,
                 0x44240305,
                 Param3,0,,
                 Param3,10,Assem100,
-                ,,
+                Assem151,,
                 ,,
                 "Listen Only",
                 "Listen Only connection for input monitoring",
-                "20 04 2C 64";
+                "20 04 24 97 2C 64";
 
 [Port]
         Object_Name = "Port Object";

@@ -43,8 +43,10 @@ struct netif;
 
 #define DEMO_APP_INPUT_ASSEMBLY_NUM                100
 #define DEMO_APP_OUTPUT_ASSEMBLY_NUM               150
+#define DEMO_APP_CONFIG_ASSEMBLY_NUM               151
 
 #define OUTPUT_ASSEMBLY_SIZE                      2
+#define CONFIG_ASSEMBLY_SIZE                      0
 #define DIGITAL_INPUT_BYTES                       2
 #define ANALOG_INPUT_COUNT                        4
 #define ANALOG_INPUT_BYTES_PER_CHANNEL            2
@@ -78,6 +80,7 @@ static const char *TAG_IO = "kc868_io";
 
 static EipUint8 s_input_assembly_data[INPUT_ASSEMBLY_SIZE];
 static EipUint8 s_output_assembly_data[OUTPUT_ASSEMBLY_SIZE];
+static EipUint8 s_config_assembly_data[1];  /* Minimal config assembly */
 static bool s_pcf8574_initialized = false;
 static bool s_adc_initialized = false;
 static adc_oneshot_unit_handle_t s_adc_handle = NULL;
@@ -299,12 +302,18 @@ EipStatus ApplicationInitialization(void) {
   CreateAssemblyObject(DEMO_APP_INPUT_ASSEMBLY_NUM, s_input_assembly_data,
                        INPUT_ASSEMBLY_SIZE);
 
+  CreateAssemblyObject(DEMO_APP_CONFIG_ASSEMBLY_NUM, s_config_assembly_data,
+                       CONFIG_ASSEMBLY_SIZE);
+
   ConfigureExclusiveOwnerConnectionPoint(0, DEMO_APP_OUTPUT_ASSEMBLY_NUM,
-                                        DEMO_APP_INPUT_ASSEMBLY_NUM, 0);
+                                        DEMO_APP_INPUT_ASSEMBLY_NUM,
+                                        DEMO_APP_CONFIG_ASSEMBLY_NUM);
   ConfigureInputOnlyConnectionPoint(0, DEMO_APP_OUTPUT_ASSEMBLY_NUM,
-                                    DEMO_APP_INPUT_ASSEMBLY_NUM, 0);
+                                    DEMO_APP_INPUT_ASSEMBLY_NUM,
+                                    DEMO_APP_CONFIG_ASSEMBLY_NUM);
   ConfigureListenOnlyConnectionPoint(0, DEMO_APP_OUTPUT_ASSEMBLY_NUM,
-                                     DEMO_APP_INPUT_ASSEMBLY_NUM, 0);
+                                     DEMO_APP_INPUT_ASSEMBLY_NUM,
+                                     DEMO_APP_CONFIG_ASSEMBLY_NUM);
   CipRunIdleHeaderSetO2T(false);
   CipRunIdleHeaderSetT2O(false);
 
