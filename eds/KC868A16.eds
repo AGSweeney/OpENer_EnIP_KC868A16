@@ -2,11 +2,11 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
 
 [File]
         DescText = "Kincony KC868-A16 EtherNet/IP Controller";
-        CreateDate = 01-16-2026;
-        CreateTime = 12:00:00;
-        ModDate = 01-16-2026;
-        ModTime = 12:00:00;
-        Revision = 1.2;
+        CreateDate = 02-10-2026;
+        CreateTime = 12:21:50;
+        ModDate = 02-10-2026;
+        ModTime = 12:21:48;
+        Revision = 1.3;
         HomeURL = "http://www.AGSweeney.net";
 
 [Device]
@@ -587,12 +587,12 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
                 0,                      $ reserved, shall equal 0
                 ,,                      $ Link Path Size, Link Path
                 0x0000,                 $ Descriptor
-                0xC1,                   $ Data Type
+                0xC6,                   $ Data Type
                 1,                      $ Data Size in bytes
                 "Config Data",          $ name
                 "",                     $ units
                 "This is not used - Placeholder Only",    $ help string
-                ,,0,                    $ min, max, default data values
+                151,151,151,            $ min, max, default data values
                 ,,,,                    $ mult, div, base, offset scaling
                 ,,,,                    $ mult, div, base, offset links
                 ;                       $ decimal places
@@ -603,7 +603,7 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
         Number_Of_Static_Instances = 3;
         Assem100 =
                 "Input Assembly",
-                "20 04 24 64",
+                "20 04 24 64 30 03",
                 10,
                 0x0000,
                 ,,
@@ -615,7 +615,7 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
                 2,Param43;
         Assem150 =
                 "Output Assembly",
-                "20 04 24 96",
+                "20 04 24 96 30 03",
                 2,
                 0x0001,
                 ,,
@@ -623,7 +623,7 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
                 1,Param5;
         Assem151 =
                 "Configuration Assembly",
-                "20 04 24 97",
+                "20 04 24 97 30 03",
                 0,
                 0x0000,
                 ,,
@@ -637,12 +637,12 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
         Number_Of_Static_Instances = 1;
         Max_Number_Of_Dynamic_Instances = 0;
         Connection1 =
-                0x84010002,
+                0x04010002,
                 0x44640405,
                 Param1,2,Assem150,
                 Param1,10,Assem100,
                 ,,
-                ,,
+                0,Param53,
                 "Exclusive Owner",
                 "Exclusive Owner connection for relay control",
                 "20 04 24 97 2C 96 2C 64";
@@ -662,7 +662,7 @@ $ EZ-EDS Version 3.38.20251024 Generated Electronic Data Sheet
                 Param3,0,,
                 Param3,10,Assem100,
                 ,,
-                ,,
+                Param43,,
                 "Listen Only",
                 "Listen Only connection for input monitoring",
                 "20 04 24 97 2C 64";
