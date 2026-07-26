@@ -4,6 +4,11 @@
 # Build folders
 build/
 **/build/
+# Keep LibraryDocs build excerpts/docs (skill layout)
+!LibraryDocs/artifacts/build/
+!LibraryDocs/artifacts/build/**
+!LibraryDocs/platform/build/
+!LibraryDocs/platform/build/**
 
 # Cache folders
 .cache/

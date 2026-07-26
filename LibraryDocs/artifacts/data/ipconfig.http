@@ -1,0 +1,26 @@
+### GET current IP configuration
+GET http://{{host}}/api/ipconfig
+Accept: application/json
+
+### POST static IP (reboot may be required by device policy)
+POST http://{{host}}/api/ipconfig
+Content-Type: application/json
+
+{
+  "dhcp": false,
+  "ip": "192.168.1.50",
+  "netmask": "255.255.255.0",
+  "gateway": "192.168.1.1",
+  "dns1": "8.8.8.8",
+  "dns2": "8.8.4.4",
+  "hostname": "KC868-A16-EnIP"
+}
+
+### POST DHCP
+POST http://{{host}}/api/ipconfig
+Content-Type: application/json
+
+{
+  "dhcp": true,
+  "hostname": "KC868-A16-EnIP"
+}
